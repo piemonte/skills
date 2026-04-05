@@ -1,0 +1,18 @@
+{
+  "name": "metal-graphics",
+  "description": "Metal GPU programming for compute and render pipelines, buffers, and shaders",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "swift",
+    "metal",
+    "gpu",
+    "graphics",
+    "compute"
+  ]
+}

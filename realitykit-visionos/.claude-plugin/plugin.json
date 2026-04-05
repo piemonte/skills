@@ -1,0 +1,18 @@
+{
+  "name": "realitykit-visionos",
+  "description": "RealityKit ECS and visionOS development for spatial computing",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "swift",
+    "realitykit",
+    "visionos",
+    "spatial",
+    "arkit"
+  ]
+}

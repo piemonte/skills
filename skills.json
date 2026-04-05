@@ -1,0 +1,80 @@
+[
+  {
+    "name": "advanced-swift-patterns",
+    "folder": "advanced-swift-patterns",
+    "description": "Use when implementing advanced Swift abstractions \u2014 property wrappers, interpolation and animation primitives, custom collection types, Combine-to-async bridging, async broadcast channels, and dynamicMemberLookup.",
+    "references": []
+  },
+  {
+    "name": "github",
+    "folder": "github",
+    "description": "\"Interact with GitHub using the `gh` CLI. Use `gh issue`, `gh pr`, `gh run`, and `gh api` for issues, PRs, CI runs, and advanced queries. Use when the user asks about GitHub issues, pull requests, workflows, or wants to interact with GitHub repositories from the command line \u2014 including tasks like check CI status, create PR, list issues, or query the GitHub API.\"",
+    "references": []
+  },
+  {
+    "name": "metal-graphics",
+    "folder": "metal-graphics",
+    "description": "Use when writing Metal GPU code \u2014 compute and render pipelines, buffer management, textures, IOSurface, compute dispatch, ring buffers, shaders, and frame pacing.",
+    "references": []
+  },
+  {
+    "name": "realitykit-visionos",
+    "folder": "realitykit-visionos",
+    "description": "Use when building visionOS apps or using RealityKit \u2014 entity-component-system architecture, custom Systems, scene subscriptions, immersive spaces, hand tracking, and multi-window scenes.",
+    "references": []
+  },
+  {
+    "name": "sonic-pi",
+    "folder": "sonic-pi",
+    "description": "Use when live coding music with Sonic Pi \u2014 synthesis, samples, live_loop, FX chains, MIDI/OSC, rings, sequencing, and performance techniques.",
+    "references": []
+  },
+  {
+    "name": "strudel",
+    "folder": "strudel",
+    "description": "Use when live coding music with Strudel \u2014 pattern-based algorithmic music in the browser using mini-notation, synths, samples, effects, scales, MIDI/OSC, and Euclidean rhythms.",
+    "references": []
+  },
+  {
+    "name": "swift-concurrency",
+    "folder": "swift-concurrency",
+    "description": "Use when writing concurrent Swift code \u2014 actors, Sendable, AsyncSequence, task cancellation, synchronization, state machines, reactive patterns, generics, testing, and diagnostics. Targets Swift 6 strict concurrency.",
+    "references": []
+  },
+  {
+    "name": "swiftui-architecture",
+    "folder": "swiftui-architecture",
+    "description": "Use when building SwiftUI apps \u2014 MVVM architecture, ViewModel and View guidelines, service layer patterns, state management, data flow, App Intents, and file organization.",
+    "references": []
+  },
+  {
+    "name": "te-model",
+    "folder": "te-model",
+    "description": "Use when defining vehicle models for LXStudio-TE \u2014 vertex, edge, and panel file formats, DMX addressing, Java model classes, coordinate system, and symmetry groups.",
+    "references": []
+  },
+  {
+    "name": "te-pattern",
+    "folder": "te-pattern",
+    "description": "Use when creating Java LED patterns for LXStudio-TE \u2014 TEPerformancePattern, audio reactivity, color system, variable-speed time, common controls, and pattern organization.",
+    "references": []
+  },
+  {
+    "name": "te-shader",
+    "folder": "te-shader",
+    "description": "Use when writing GLSL shaders for LXStudio-TE \u2014 uniform reference, pragma system, include library, audio textures, palette functions, and auto-registration.",
+    "references": []
+  },
+  {
+    "name": "te-show",
+    "folder": "te-show",
+    "description": "Use when configuring show files for LXStudio-TE \u2014 .lxp JSON structure, channel setup, view definitions, and project naming conventions.",
+    "references": []
+  },
+  {
+    "name": "te-vehicle-bootstrap",
+    "folder": "te-vehicle-bootstrap",
+    "description": "Use when bootstrapping a new vehicle for LXStudio-TE \u2014 end-to-end guide covering geometry, fixtures, show files, test patterns, and troubleshooting.",
+    "references": []
+  }
+]

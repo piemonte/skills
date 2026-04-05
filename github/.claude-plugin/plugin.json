@@ -1,0 +1,18 @@
+{
+  "name": "github",
+  "description": "Interact with GitHub using the gh CLI for issues, PRs, CI runs, and API queries",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "gh",
+    "cli",
+    "pull-requests",
+    "ci"
+  ]
+}

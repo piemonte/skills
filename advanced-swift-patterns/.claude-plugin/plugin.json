@@ -1,0 +1,18 @@
+{
+  "name": "advanced-swift-patterns",
+  "description": "Advanced Swift abstractions including property wrappers, interpolation, and custom collections",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "swift",
+    "patterns",
+    "property-wrappers",
+    "collections",
+    "animation"
+  ]
+}

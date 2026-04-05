@@ -1,0 +1,18 @@
+{
+  "name": "sonic-pi",
+  "description": "Live coding music with Sonic Pi \u2014 synthesis, samples, live_loop, FX, MIDI, and OSC",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "sonic-pi",
+    "music",
+    "live-coding",
+    "synthesis",
+    "ruby"
+  ]
+}

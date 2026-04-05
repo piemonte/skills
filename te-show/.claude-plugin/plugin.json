@@ -1,0 +1,17 @@
+{
+  "name": "te-show",
+  "description": "Show file configuration for LXStudio-TE with channel setup and view definitions",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "lxstudio",
+    "show",
+    "configuration",
+    "led"
+  ]
+}
