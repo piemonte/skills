@@ -1,389 +1,342 @@
 ---
 name: te-model
-description: Use when defining vehicle models for LXStudio-TE — vertex, edge, and panel file formats, DMX addressing, Java model classes, coordinate system, and symmetry groups.
+description: Use when working with LXStudio-TE vehicle models and fixture files — .lxf fixture format, vehicle architecture, edge/panel/window fixtures, transforms, ArtNet output, and Java model classes.
 ---
 
-# TE Vehicle Model Definition
+# TE Vehicle Model & Fixture System
 
-This reference covers the complete vehicle model system for Titanic's End (and adaptable vehicles like Mothership). The model defines 3D geometry, LED fixture mapping, and DMX hardware addressing.
+Vehicle geometry, LED fixture mapping, and hardware addressing in LXStudio-TE are defined by `.lxf` fixture files (JSON-based Chromatik format). Each vehicle has its own fixture hierarchy with vehicle-specific component types.
 
 ## Architecture Overview
 
 ```
-TEWholeModel (Interface)
-├── TEVertex (60+ vertices with 3D coordinates)
-├── TEEdgeModel (LED strips between vertices)
-│   └── TEEdgeModel.Point[] (individual LEDs with position)
-├── TEPanelModel (triangular LED surfaces)
-│   └── TEPanelModel.Point[] (LEDs with distance from centroid)
-├── DmxModel (Beacons, DJ Lights)
-└── TELaserModel (Laser fixtures)
+te-app/Fixtures/
+├── TE/                          Titanic's End vehicle
+│   ├── TE.lxf                   Master wrapper — references all edges and panels
+│   ├── edge/                    205 edge fixtures (LED strips between vertices)
+│   │   └── Edge9-12.lxf ...
+│   ├── panel/                   70 panel fixtures (triangular LED surfaces)
+│   │   └── FA.lxf ...
+│   └── module/                  Module-level groupings
+├── Mothership/                  Mothership vehicle
+│   ├── Mothership.lxf           Master wrapper — references all slices
+│   └── window/                  Window/slice fixtures (radial segments)
+│       └── Slice01P.lxf ...
+├── Beacons/                     Shared beacon fixtures
+├── Grids/                       Grid/display fixtures
+└── Utility/                     Common utilities
 ```
 
-## Resource Files
+**Key point:** Vehicle components are vehicle-specific. TE uses panels and edges; Mothership uses windows and slices. A new vehicle would define its own fixture types — you would not reuse TE's panel and edge fixtures.
 
-All vehicle definition files live in `te-app/resources/vehicle/`.
-
-### general.txt
-
-Simple key-value metadata:
+### Data Flow
 
 ```
-name: Titanic's End
+.lxf fixture files → LX framework loads and parses → TEWholeModelDynamic post-processes
+→ Wraps into TEEdgeModel / TEPanelModel / TEVertex → Available to patterns via modelTE
 ```
 
-### vertexes.txt
+## .lxf Fixture File Format
 
-Defines 3D vertex positions. Four space-separated columns:
+Fixture files use JSON (with comments allowed). Every `.lxf` file has this general structure:
 
-| Column | Description |
-|--------|-------------|
-| Vertex ID | Integer identifier (e.g., 9, 10, 25) |
-| X | Left-right position in microns |
-| Y | Vertical position in microns |
-| Z | Front-back position in microns |
-
-```
-9      2286000    304799     4496209
-10    -2286000    304799     4496209
-11    -2286000    304800      996900
-12     2286000    304800      996900
-25     2286000   3962400     5872727
-26    -2286000   3962400     5872727
-27     1346200   3962400     7366000
-28    -1346200   3962400     7366000
-30            0  11430000     4870002
-31    -1219200   8873911     3613224
+```jsonc
+{
+  label: "Display Name",
+  tags: [ "tag1", "tag2" ],
+  parameters: { /* configurable values */ },
+  transforms: [ /* 3D positioning and rotation */ ],
+  meta: { /* metadata linking to the Java model */ },
+  components: [ /* LED geometry definition */ ],
+  outputs: [ /* ArtNet controller routing */ ]
+}
 ```
 
-**Coordinate system:**
-- X: -2.3M to +2.3M (port to starboard)
-- Y: 0 to 11.4M (ground to apex)
-- Z: -9.8M to +7.4M (aft to fore)
-- Units: microns (1,000,000 = 1 meter)
+### Parameters
 
-### edges.txt
+Typed, configurable values with defaults. Referenced elsewhere via `$name` syntax.
 
-Defines LED strips connecting two vertices. Tab-separated columns:
-
-| Column | Description |
-|--------|-------------|
-| V0-V1 | Vertex pair (e.g., `9-12`) |
-| Orientation | `default` or `reversed` (LED wiring direction) |
-| Pixel Count | Number of addressable LEDs on this strip |
-| Module Address | Pixelblaze controller address (see DMX Addressing) |
-
-```
-9-12    reversed   188    x10.7.19.120#1:233
-9-83    reversed    48    x10.7.19.121#1
-9-114   default    119    x10.7.19.121#1:48
-9-116   reversed   158    x10.7.19.123#2:249
-10-11   reversed   188    10.7.11.120#1:234
-10-100  reversed    48    10.7.11.121#1
-10-115  default    119    10.7.11.121#1:48
-10-117  reversed   158    10.7.11.123#1:249
+```jsonc
+parameters: {
+  "points": { default: 188, type: "int", min: 1, label: "Points", description: "Number of points in the edge" },
+  "host": { default: "10.7.19.120", type: "string", label: "Host", description: "Controller IP address or hostname" },
+  "output": { default: 1, type: "int", min: 1, max: 4, label: "Output", description: "Controller output 1-4" },
+  "ledOffset": { default: 233, type: "int", min: 0, label: "LED Offset", description: "0-based starting position in pixels" },
+  "reverse": { default: true, type: "boolean", label: "Reverse", description: "Reverse the output direction" },
+  "onCar": { default: true, type: "boolean", label: "On Car", description: "True = Locate to position on car, False = Locate to origin" },
+  "artnetSequence": { default: false, type: "boolean", label: "ArtNet Sequence", description: "Enable ArtNet sequence packets" }
+}
 ```
 
-- `reversed` means LED data flows from V1 toward V0
-- Edge IDs are always formatted as `smallerID-largerID`
-
-### panels.txt
-
-Defines triangular LED surfaces. Tab-separated columns:
-
-| Column | Description |
-|--------|-------------|
-| Panel ID | Alphanumeric name (e.g., `FA`, `SCA`) |
-| Pixel Count | Total addressable LEDs |
-| Edge 1 | First bounding edge (vertex pair) |
-| Edge 2 | Second bounding edge |
-| Edge 3 | Third bounding edge |
-| Winding Order | Leading edge direction (e.g., `91->89`) |
-| Flip | `unflipped` or `flipped` (texture mirroring) |
-| Module Address | DMX controller(s), `/` separates multi-module panels |
-
-```
-FA      1270    89-91   89-126  91-126  91->89  unflipped  10.7.21.215#1/10.7.21.214#3
-FB      1198    81-89   81-91   89-91   91->89  unflipped  10.7.21.213#1/10.7.21.214#1
-FSA      774    89-125  89-126  125-126 126->125 unflipped 10.7.10.14#1
-FSB      489    70-81   81-89   70-89   81->89  unflipped  10.7.21.212#1
-```
-
-**Panel ID naming convention:**
-- `F` = Fore (front)
-- `A` = Aft (back)
-- `S` = Starboard (right side) or Sub-section
-- `P` = Port (left side)
-- Additional: `C` (center), `E` (edge), `U` (upper), `D` (down)
-- Examples: `SCA` = Starboard Center A, `PFA` = Port Fore A
-
-### views.txt
-
-Groups of fixtures for selective rendering. Tab-separated:
-
-| Column | Description |
-|--------|-------------|
-| Label | View name (`;` suffix = relative normalization) |
-| Relative Norm | `true` for relative coordinate normalization |
-| Selector | Comma or semicolon-separated fixture IDs |
-
-```
-Fixtures;    true    912;983;9114;9116;1011;...
-Edges        true    Edge
-Panels       true    Panel
-Panel Sections    true    fore;aft;starboard-fore;starboard-aft;port-fore;port-aft;...
-Outline      true    113117,28113,28111,111119,...
-Outline DJ   true    11-98,98-99,99-101,44-101,...
-```
-
-- `Edge` and `Panel` are special selectors matching all edges/panels
-- Numeric selectors reference fixture component IDs
-- Semicolons in the label enable per-fixture relative normalization
-
-### tags.properties
-
-Semantic groupings for choreography. Key-value format:
-
-```properties
-top-e=44-101,44-47,39-44,39-101,44-50,47-50
-dj-e=44-101,44-47,39-44,39-101,44-50,47-50,10-11,10-100,11-100,...
-left-p=ASA,ASB,ASC,SAA,SAB,SAC,SAD,SBA,SBB,SBC,SBD,SBE,SCA,SCB,SCC
-right-p=APA,APB,APC,PAA,PAB,PAC,PAD,PBA,PBB,PBC,PBD,PBE,PCA,PCB,PCC
-outline=113-117,28-113,28-111,111-119,...
-```
-
-- `-e` suffix = edge tags
-- `-p` suffix = panel tags
-- Tags: `top`, `dj`, `left`, `right`, `port`, `starboard`, `outline`
-
-### modules.txt
-
-Groups edges by physical construction module (numbered 1-13):
-
-```
-1: 81-89-91-81 70-81-82-92 92-81-73
-2: 84-86-88-120 84-88-25-84 88-110-25-27-110 88-119-110 ...
-```
-
-Each module groups spatially adjacent edges for installation tracking.
-
-### Additional Resource Files
-
-| File | Purpose |
+| Type | Example |
 |------|---------|
-| `beacons.txt` | Beacon fixtures (B1-B3, BJKB) with IP/DMX |
-| `djLights.txt` | DJ light fixtures (DJ1, DJ2, DJJKB) |
-| `lasers.txt` | Laser positions (HP1-HP4, AS1-AS8) |
-| `boxes.txt` | 3D bounding boxes (8 entries) |
-| `panel_adjustments.txt` | Panel distortion corrections |
-| `striping-instructions.txt` | Panel pixel sequencing instructions |
+| `int` | `{ default: 188, type: "int", min: 1, max: 4 }` |
+| `float` | `{ default: 7.53, type: "float" }` |
+| `string` | `{ default: "10.7.19.120", type: "string" }` |
+| `boolean` | `{ default: true, type: "boolean" }` |
 
-## DMX Addressing
+### Transforms
 
-TE uses Pixelblaze Output Expander controllers. Address format:
+Sequential 3D positioning. Each entry applies one transformation. Use `enabled: "$param"` to make transforms conditional.
 
+```jsonc
+transforms: [
+  { x: "-177.0161", enabled: "$onCar" },     // translate X
+  { y: "12.0000", enabled: "$onCar" },        // translate Y
+  { z: "90.0000", enabled: "$onCar" },         // translate Z
+  { yaw: "0.0000", enabled: "$onCar" },        // rotate around Y axis
+  { roll: "0.0000", enabled: "$onCar" },       // rotate around Z axis
+  { pitch: "-167.3002", enabled: "$onCar" },   // rotate around X axis
+  { x: "$xOffset" }                            // parameter-driven offset
+]
 ```
-IP#UNIVERSE:CHANNEL
+
+Transforms support expressions: `{ roll: "(-6.5 - ($radial - 1)) * 360 / 24" }`
+
+### Meta
+
+Metadata that links the fixture to the Java model. The `TEWholeModelDynamic` class reads these fields to build domain objects.
+
+**Edge meta:**
+```jsonc
+meta: {
+  "edgeId": "9-12",
+  "v0": "9",
+  "v1": "12",
+  "module": "19"
+}
 ```
 
-| Component | Description |
-|-----------|-------------|
-| IP | Controller IP address (e.g., `10.7.19.120`) |
-| `#` | Separator |
-| UNIVERSE | Output universe number (1-8) |
-| `:CHANNEL` | Optional starting channel offset |
+**Panel meta:**
+```jsonc
+meta: {
+  "panelId": "FA",
+  "v0": "91", "v1": "89", "v2": "126",
+  "edge1": "89-91", "edge2": "89-126", "edge3": "91-126",
+  "leadingEdge": "91->89",
+  "module": "21"
+}
+```
 
-Examples:
-- `10.7.19.120#1:233` — IP 10.7.19.120, universe 1, starting at channel 233
-- `x10.7.19.121#1` — `x` prefix marks controllers needing special handling
-- `10.7.21.215#1/10.7.21.214#3` — Panel spans two controllers
+### Components
+
+Define LED geometry. Component types are vehicle-specific.
+
+**Edge — single strip:**
+```jsonc
+components: [
+  { type: "strip", numPoints: "$points", spacing: "0.6562" }
+]
+```
+
+**Panel — rows of LEDs with a backing surface:**
+```jsonc
+components: [
+  { type: "panelRow", row: "0", offset: "0", numPoints: "59" },
+  { type: "panelRow", row: "1", offset: "1", numPoints: "57" },
+  // ... rows decrease in width toward the triangle apex
+  { type: "panelRow", row: "41", offset: "8", numPoints: "2" },
+  { type: "panelBacking", rows: "41", offset: "8", numPointsLast: "2", numPointsFirst: "59",
+    showBacking: "$showBacking", flipBacking: "$flipBacking" }
+]
+```
+
+**Mothership window — references window sub-fixtures:**
+```jsonc
+components: [
+  { type: "Window1", id: "w1", extraLEDs: "$w1extraLEDs", ledOffset: "$w1ledOffset" },
+  { type: "Window2", id: "w2", extraLEDs: "$w2extraLEDs", ledOffset: "$w2ledOffset" },
+  // ... up to Window8B
+]
+```
+
+### Outputs
+
+ArtNet controller routing. Supports expressions for universe/channel calculation.
+
+**Edge output (single strip):**
+```jsonc
+outputs: [
+  { enabled: "$hasOutput",
+    host: "$host",
+    universe: "$output*10+(($ledOffset*3)/510)",
+    channel: "($ledOffset*3)%510",
+    protocol: "artnet",
+    sequenceEnabled: "$artnetSequence",
+    reverse: "$reverse"
+  }
+]
+```
+
+**Panel output (multi-strand with segments):**
+```jsonc
+outputs: [
+  { host: "$strand1host",
+    universe: "$strand1output*10",
+    protocol: "artnet",
+    sequenceEnabled: "$artnetSequence",
+    segments: [
+      { componentIndex: 0, reverse: false },
+      { componentIndex: 1, reverse: true },
+      { componentIndex: 2, reverse: false },
+      { componentIndex: 3, reverse: true, padPre: 1 },
+      { componentIndex: 4, reverse: false, length: 22 }
+    ]
+  }
+  // Additional strand outputs follow the same pattern
+]
+```
+
+Segments map component rows to physical LED strands, handling serpentine wiring (alternating `reverse`) and partial rows (`start`, `length`, `padPre`).
+
+## Master Wrapper Files
+
+Each vehicle has a master `.lxf` that references all sub-fixtures.
+
+**TE.lxf** — references edges and panels by relative path:
+```jsonc
+{
+  label: "TE",
+  tags: [ "te", "car" ],
+  parameters: {
+    "artnetSequence": { default: false, type: "boolean" },
+    "showBacking": { type: "boolean", default: "true" }
+  },
+  components: [
+    { type: "edge/Edge9-12", artnetSequence: "$artnetSequence" },
+    { type: "edge/Edge9-83", artnetSequence: "$artnetSequence" },
+    // ... 205 edges
+    { type: "panel/FA", artnetSequence: "$artnetSequence", showBacking: "$showBacking" },
+    { type: "panel/FB", artnetSequence: "$artnetSequence", showBacking: "$showBacking" },
+    // ... 70 panels
+  ]
+}
+```
+
+**Mothership.lxf** — references slices:
+```jsonc
+{
+  label: "Mothership",
+  tag: "mothership",
+  components: [
+    { type: "window/Ramp" },
+    { type: "window/Slice01P" },
+    { type: "window/Slice01S" },
+    // ... 40 slices (20 port + 20 starboard)
+  ]
+}
+```
+
+## Vehicle Comparison
+
+| Aspect | Titanic's End | Mothership |
+|--------|--------------|------------|
+| Fixture path | `Fixtures/TE/` | `Fixtures/Mothership/` |
+| Primary components | Edges (strips) + Panels (triangles) | Windows (LED rings) in Slices |
+| Component count | 205 edges, 70 panels | ~40 slices with 8-9 windows each |
+| Geometry | Vertices + edges forming triangulated surfaces | Radial slices around a central axis |
+| Positioning | XYZ translation + yaw/roll/pitch | Y translation + radial roll expression |
+| Tags | `edge`, `panel`, module (`m19`), position (`bottom`) | `slice`, `port`/`starboard`, slice ID |
 
 ## Java Model Classes
 
+These classes wrap fixture data at runtime. They are populated from fixture metadata by `TEWholeModelDynamic` — not from the legacy text files.
+
 ### TEWholeModel (Interface)
-
-**Path:** `te-app/src/main/java/titanicsend/model/TEWholeModel.java`
-
-The top-level model interface. Extends `DmxWholeModel`.
 
 ```java
 public interface TEWholeModel extends DmxWholeModel {
-    // Listeners
-    void addListener(TEModelListener listener);
-    void removeListener(TEModelListener listener);
-
-    // Point access
     List<LXPoint> getPoints();
     List<LXPoint> getEdgePoints();
     List<LXPoint> getPanelPoints();
-    List<LXPoint> getPointsBySection(TEPanelSection section);
 
-    // Bounding box
-    float minX(); float maxX();
-    float minY(); float maxY();
-    float minZ(); float maxZ();
-
-    // Vertex access
     TEVertex getVertex(int id);
     Map<Integer, TEVertex> getVertexes();
 
-    // Edge access
-    boolean hasEdge(String edgeId);
     TEEdgeModel getEdge(String edgeId);
     Map<String, TEEdgeModel> getEdges();
     Map<Integer, List<TEEdgeModel>> getEdgesBySymmetryGroup();
 
-    // Panel access
-    boolean hasPanel(String panelId);
     TEPanelModel getPanel(String panelId);
     Map<String, TEPanelModel> getPanels();
 
-    // Special fixtures
     List<DmxModel> getBeacons();
     List<DmxModel> getDjLights();
     List<TELaserModel> getLasers();
 
-    // Model type
-    boolean isStatic();  // true = 2022-23 static, false = 2024+ dynamic
-}
-```
-
-### TEVertex
-
-**Path:** `te-app/src/main/java/titanicsend/model/TEVertex.java`
-
-Extends `LXVector`. Represents a 3D junction point.
-
-```java
-public class TEVertex extends LXVector {
-    public final int id;
-    public Set<TEEdgeModel> edges;    // Connected edges (unmodifiable)
-    public Set<TEPanelModel> panels;  // Connected panels (unmodifiable)
-
-    // Static registry
-    static Map<Integer, LXVector> vertexLookup;
-    static void registerVertex(Integer id, LXVector position);
-
-    // Constructors
-    TEVertex(LXVector vector, int id);  // Static model (explicit coords)
-    TEVertex(int id);                    // Dynamic model (coords from edges)
-
-    // Methods
-    void addEdge(TEEdgeModel edge);
-    void addPanel(TEPanelModel panel);
-    void nudgeToward(LXVector target, float fraction);
+    boolean isStatic();  // false for current dynamic fixture system
 }
 ```
 
 ### TEEdgeModel
 
-**Path:** `te-app/src/main/java/titanicsend/model/TEEdgeModel.java`
-
-Extends `TEModel`. Represents an LED strip between two vertices.
+Represents an LED strip between two vertices. `edgeId` from fixture meta (e.g., `"9-12"`).
 
 ```java
 public class TEEdgeModel extends TEModel {
-    public static final String TE_MODEL_TYPE = "Edge";
-
-    // Point wrapper with position metadata
     public static class Point {
         public final LXPoint point;
-        public final int i;      // Index along edge (0..size)
-        public final float n;    // Fractional position (0.0..1.0)
+        public final int i;      // index along edge
+        public final float n;    // fractional position 0.0..1.0
     }
 
-    // Fields
     public final Point[] edgePoints;
-    public final int size;           // Number of LEDs
-    public final TEVertex v0, v1;    // Endpoint vertices
+    public final int size;
+    public final TEVertex v0, v1;
     public final LXVector centroid;
     public Set<TEPanelModel> connectedPanels;
     public List<TEEdgeModel> symmetryGroup;
-
-    // Metadata keys: "edgeId", "v0", "v1", "module"
 }
 ```
 
 ### TEPanelModel
 
-**Path:** `te-app/src/main/java/titanicsend/model/TEPanelModel.java`
-
-Extends `TEModel`. Represents a triangular LED surface.
+Represents a triangular LED surface. `panelId` from fixture meta (e.g., `"FA"`).
 
 ```java
 public class TEPanelModel extends TEModel {
-    public static final String TE_MODEL_TYPE = "Panel";
-
-    // Point wrapper with distance metadata
     public static class Point {
         public final LXPoint point;
-        public final double r;     // Distance from centroid
-        public final double rn;    // Normalized distance (0.0..1.0)
+        public final double r;     // distance from centroid
+        public final double rn;    // normalized 0.0..1.0
     }
 
-    // Fields
     public final Point[] panelPoints;
     public final LXVector centroid;
-    public final TEVertex v0, v1, v2;         // Triangle vertices
-    public final String edge0id, edge1id, edge2id;
-    public final TEEdgeModel e0, e1, e2;      // Bounding edges
-    public final List<TEEdgeModel> edges;      // Unmodifiable
-    public List<TEPanelModel> neighbors;       // Share an edge
-    public List<TEPanelModel> vertexNeighbors; // Share only a vertex
-
-    // Metadata keys: "panelId", "v0", "v1", "v2",
-    //   "edge1", "edge2", "edge3", "leadingEdge", "module"
+    public final TEVertex v0, v1, v2;
+    public final TEEdgeModel e0, e1, e2;
+    public List<TEPanelModel> neighbors;       // share an edge
+    public List<TEPanelModel> vertexNeighbors; // share only a vertex
 }
 ```
 
-## Adapting for a New Vehicle
+### TEVertex
 
-When defining a new vehicle (e.g., Mothership):
+3D junction point. Coordinates derived from fixture transforms (not from `vertexes.txt`).
 
-1. **Create a new vehicle directory** under `te-app/resources/vehicle/` or a parallel path
-2. **Define `general.txt`** with the vehicle name
-3. **Plot vertices** — measure or CAD-export all junction points in microns
-4. **Map edges** — for each LED strip, record:
-   - Which two vertices it connects
-   - Wiring direction (`default` or `reversed`)
-   - LED pixel count
-   - Controller IP and universe/channel
-5. **Map panels** — for each triangular surface:
-   - Three bounding edges
-   - Winding order (leading edge direction)
-   - Flip status
-   - Controller address(es)
-6. **Define views** — group fixtures for selective rendering
-7. **Add tags** — semantic groupings (top, bottom, left, right, etc.)
-8. **Verify in LXStudio** — load the model and confirm geometry renders correctly
-
-### Coordinate Tips
-
-- Use consistent units (microns recommended for precision)
-- Orient Y-axis as vertical (ground = 0)
-- Center X-axis on the vehicle's symmetry plane
-- Z-axis runs front-to-back
-- Vertex IDs must be unique integers
-- Edge IDs auto-format as `smallerID-largerID`
-
-### Symmetry Groups
-
-Edges with matching geometry reflected about the XY or YZ planes are automatically grouped. This enables symmetric pattern application — animate one side and mirror to the other.
+```java
+public class TEVertex extends LXVector {
+    public final int id;
+    public Set<TEEdgeModel> edges;
+    public Set<TEPanelModel> panels;
+}
+```
 
 ## Common Patterns Using Model Data
 
 ### Iterate All Edge Points
+
 ```java
 for (TEEdgeModel edge : modelTE.getEdges().values()) {
     for (TEEdgeModel.Point ep : edge.edgePoints) {
         // ep.n = fractional position (0.0 at v0, 1.0 at v1)
-        // ep.point = LXPoint with x, y, z coordinates
         colors[ep.point.index] = calcColor();
     }
 }
 ```
 
 ### Iterate All Panel Points
+
 ```java
 for (TEPanelModel panel : modelTE.getPanels().values()) {
     for (TEPanelModel.Point pp : panel.panelPoints) {
@@ -393,17 +346,6 @@ for (TEPanelModel panel : modelTE.getPanels().values()) {
 }
 ```
 
-### Query by Tag
-```java
-// Tags are accessible through the view/selector system
-// Use TEShaderView enum for pattern-level view selection
-```
+## Legacy Reference Files
 
-### Check Model Type
-```java
-if (modelTE.isStatic()) {
-    // 2022-23 static model with explicit coordinates
-} else {
-    // 2024+ dynamic model with metadata-driven coordinates
-}
-```
+The `te-app/resources/vehicle/` directory contains text files (`vertexes.txt`, `edges.txt`, `panels.txt`, `views.txt`, `tags.properties`, `modules.txt`) from the original configuration system. These are **not used at runtime** — all vehicle mapping is now done through `.lxf` fixture files. The text files are retained for historical reference only.

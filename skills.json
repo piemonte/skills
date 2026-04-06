@@ -50,7 +50,7 @@
   {
     "name": "te-model",
     "folder": "te-model",
-    "description": "Use when defining vehicle models for LXStudio-TE \u2014 vertex, edge, and panel file formats, DMX addressing, Java model classes, coordinate system, and symmetry groups.",
+    "description": "Use when working with LXStudio-TE vehicle models and fixture files \u2014 .lxf fixture format, vehicle architecture, edge/panel/window fixtures, transforms, ArtNet output, and Java model classes.",
     "references": []
   },
   {
