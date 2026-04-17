@@ -49,28 +49,54 @@ Each skill is independently installable. Choose the platform that matches your e
 
 ### Claude Code (via Plugin Marketplace)
 
-```bash
-# Add the marketplace (one-time)
-/plugin marketplace add piemonte/skills
+Add the marketplace once, then install the skills you want.
 
-# Install individual skills
-/plugin install skills@swift-concurrency
-/plugin install skills@sonic-pi
-/plugin install skills@te-pattern
+```bash
+/plugin marketplace add piemonte/skills
 ```
+
+| Skill | Install command |
+|-------|-----------------|
+| `swift-concurrency` | `/plugin install skills@swift-concurrency` |
+| `swiftui-architecture` | `/plugin install skills@swiftui-architecture` |
+| `metal-graphics` | `/plugin install skills@metal-graphics` |
+| `realitykit-visionos` | `/plugin install skills@realitykit-visionos` |
+| `advanced-swift-patterns` | `/plugin install skills@advanced-swift-patterns` |
+| `te-pattern` | `/plugin install skills@te-pattern` |
+| `te-shader` | `/plugin install skills@te-shader` |
+| `te-model` | `/plugin install skills@te-model` |
+| `te-show` | `/plugin install skills@te-show` |
+| `te-vehicle-bootstrap` | `/plugin install skills@te-vehicle-bootstrap` |
+| `sonic-pi` | `/plugin install skills@sonic-pi` |
+| `strudel` | `/plugin install skills@strudel` |
+| `github` | `/plugin install skills@github` |
 
 ### Codex
 
-```bash
-# Clone the repository
-git clone https://github.com/piemonte/skills.git ~/.codex/piemonte-skills
+Clone once, then symlink the skills you want.
 
-# Create symlinks for the skills you need
-ln -s ~/.codex/piemonte-skills/swift-concurrency ~/.agents/skills/swift-concurrency
-ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi
+```bash
+git clone https://github.com/piemonte/skills.git ~/.codex/piemonte-skills
+mkdir -p ~/.agents/skills
 ```
 
-See each skill's [`.codex/INSTALL.md`](.codex/INSTALL.md) for Windows instructions and more details.
+| Skill | Install command |
+|-------|-----------------|
+| `swift-concurrency` | `ln -s ~/.codex/piemonte-skills/swift-concurrency ~/.agents/skills/swift-concurrency` |
+| `swiftui-architecture` | `ln -s ~/.codex/piemonte-skills/swiftui-architecture ~/.agents/skills/swiftui-architecture` |
+| `metal-graphics` | `ln -s ~/.codex/piemonte-skills/metal-graphics ~/.agents/skills/metal-graphics` |
+| `realitykit-visionos` | `ln -s ~/.codex/piemonte-skills/realitykit-visionos ~/.agents/skills/realitykit-visionos` |
+| `advanced-swift-patterns` | `ln -s ~/.codex/piemonte-skills/advanced-swift-patterns ~/.agents/skills/advanced-swift-patterns` |
+| `te-pattern` | `ln -s ~/.codex/piemonte-skills/te-pattern ~/.agents/skills/te-pattern` |
+| `te-shader` | `ln -s ~/.codex/piemonte-skills/te-shader ~/.agents/skills/te-shader` |
+| `te-model` | `ln -s ~/.codex/piemonte-skills/te-model ~/.agents/skills/te-model` |
+| `te-show` | `ln -s ~/.codex/piemonte-skills/te-show ~/.agents/skills/te-show` |
+| `te-vehicle-bootstrap` | `ln -s ~/.codex/piemonte-skills/te-vehicle-bootstrap ~/.agents/skills/te-vehicle-bootstrap` |
+| `sonic-pi` | `ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi` |
+| `strudel` | `ln -s ~/.codex/piemonte-skills/strudel ~/.agents/skills/strudel` |
+| `github` | `ln -s ~/.codex/piemonte-skills/github ~/.agents/skills/github` |
+
+See each skill's `.codex/INSTALL.md` (e.g. [`swift-concurrency/.codex/INSTALL.md`](swift-concurrency/.codex/INSTALL.md)) for Windows instructions.
 
 ### Cursor (via Plugin Marketplace)
 
