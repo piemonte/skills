@@ -1,0 +1,193 @@
+{
+  "name": "skills",
+  "owner": {
+    "name": "patrick piemonte"
+  },
+  "metadata": {
+    "description": "Agentic skills for creative coding and development — Apple platforms, LED art vehicles, live music coding, and developer tools"
+  },
+  "plugins": [
+    {
+      "name": "swift-concurrency",
+      "source": "./swift-concurrency",
+      "description": "Swift 6 concurrency patterns for actors, Sendable, AsyncSequence, and strict concurrency",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["swift", "concurrency", "actors", "async", "sendable"],
+      "category": "languages",
+      "tags": ["swift", "concurrency", "actors", "async", "sendable"]
+    },
+    {
+      "name": "swiftui-architecture",
+      "source": "./swiftui-architecture",
+      "description": "SwiftUI app architecture with MVVM, state management, and service layer patterns",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["swift", "swiftui", "mvvm", "architecture", "ios"],
+      "category": "frameworks",
+      "tags": ["swift", "swiftui", "mvvm", "architecture", "ios"]
+    },
+    {
+      "name": "metal-graphics",
+      "source": "./metal-graphics",
+      "description": "Metal GPU programming for compute and render pipelines, buffers, and shaders",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["swift", "metal", "gpu", "graphics", "compute"],
+      "category": "graphics",
+      "tags": ["swift", "metal", "gpu", "graphics", "compute"]
+    },
+    {
+      "name": "realitykit-visionos",
+      "source": "./realitykit-visionos",
+      "description": "RealityKit ECS and visionOS development for spatial computing",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["swift", "realitykit", "visionos", "spatial", "arkit"],
+      "category": "frameworks",
+      "tags": ["swift", "realitykit", "visionos", "spatial", "arkit"]
+    },
+    {
+      "name": "advanced-swift-patterns",
+      "source": "./advanced-swift-patterns",
+      "description": "Advanced Swift abstractions including property wrappers, interpolation, and custom collections",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["swift", "patterns", "property-wrappers", "collections", "animation"],
+      "category": "languages",
+      "tags": ["swift", "patterns", "property-wrappers", "collections", "animation"]
+    },
+    {
+      "name": "te-pattern",
+      "source": "./te-pattern",
+      "description": "Java LED pattern development for LXStudio-TE with audio reactivity and color systems",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["java", "lxstudio", "led", "patterns", "audio"],
+      "category": "creative-coding",
+      "tags": ["java", "lxstudio", "led", "patterns", "audio"]
+    },
+    {
+      "name": "te-shader",
+      "source": "./te-shader",
+      "description": "GLSL shader development for LXStudio-TE with uniforms, pragmas, and auto-registration",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["glsl", "shaders", "lxstudio", "led", "gpu"],
+      "category": "graphics",
+      "tags": ["glsl", "shaders", "lxstudio", "led", "gpu"]
+    },
+    {
+      "name": "te-model",
+      "source": "./te-model",
+      "description": "Vehicle model definition for LXStudio-TE with geometry, fixtures, and DMX addressing",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["lxstudio", "model", "dmx", "led", "vehicle"],
+      "category": "creative-coding",
+      "tags": ["lxstudio", "model", "dmx", "led", "vehicle"]
+    },
+    {
+      "name": "te-show",
+      "source": "./te-show",
+      "description": "Show file configuration for LXStudio-TE with channel setup and view definitions",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["lxstudio", "show", "configuration", "led"],
+      "category": "creative-coding",
+      "tags": ["lxstudio", "show", "configuration", "led"]
+    },
+    {
+      "name": "te-vehicle-bootstrap",
+      "source": "./te-vehicle-bootstrap",
+      "description": "End-to-end vehicle bootstrapping guide for LXStudio-TE",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["lxstudio", "vehicle", "bootstrap", "led", "setup"],
+      "category": "creative-coding",
+      "tags": ["lxstudio", "vehicle", "bootstrap", "led", "setup"]
+    },
+    {
+      "name": "sonic-pi",
+      "source": "./sonic-pi",
+      "description": "Live coding music with Sonic Pi — synthesis, samples, live_loop, FX, MIDI, and OSC",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["sonic-pi", "music", "live-coding", "synthesis", "ruby"],
+      "category": "creative-coding",
+      "tags": ["sonic-pi", "music", "live-coding", "synthesis", "ruby"]
+    },
+    {
+      "name": "strudel",
+      "source": "./strudel",
+      "description": "Strudel live coding for algorithmic music — patterns, mini-notation, synths, samples, effects, and MIDI/OSC",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["strudel", "music", "live-coding", "algorithmic", "tidalcycles", "patterns"],
+      "category": "creative-coding",
+      "tags": ["strudel", "music", "live-coding", "algorithmic", "tidalcycles", "patterns"]
+    },
+    {
+      "name": "github",
+      "source": "./github",
+      "description": "Interact with GitHub using the gh CLI for issues, PRs, CI runs, and API queries",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["github", "gh", "cli", "pull-requests", "ci"],
+      "category": "devtools",
+      "tags": ["github", "gh", "cli", "pull-requests", "ci"]
+    },
+    {
+      "name": "idea-framing",
+      "source": "./idea-framing",
+      "description": "Frame a concept using a five-section template — Concept, Problem, Why interesting, State of the art, Solution, Technical",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["ideation", "framing", "concept", "thinking", "writing"],
+      "category": "thinking",
+      "tags": ["ideation", "framing", "concept", "thinking", "writing"]
+    }
+  ]
+}
