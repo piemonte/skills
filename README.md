@@ -43,6 +43,12 @@ Skills for live coding music and algorithmic composition with [Sonic Pi](https:/
 |-------|-------------|
 | [`github`](github/) | Interact with GitHub using the `gh` CLI — issues, PRs, CI runs, workflow debugging, and API queries |
 
+## Thinking & Ideation
+
+| Skill | Description |
+|-------|-------------|
+| [`idea-framing`](idea-framing/) | Frame a concept using a five-section template — Concept, Problem, Why interesting, State of the art, Solution; supports guided Q&A, structuring a dump, or critiquing a draft |
+
 ## Installation
 
 Each skill is independently installable. Choose the platform that matches your environment.
@@ -57,19 +63,20 @@ Add the marketplace once, then install the skills you want.
 
 | Skill | Install command |
 |-------|-----------------|
-| `swift-concurrency` | `/plugin install skills@swift-concurrency` |
-| `swiftui-architecture` | `/plugin install skills@swiftui-architecture` |
-| `metal-graphics` | `/plugin install skills@metal-graphics` |
-| `realitykit-visionos` | `/plugin install skills@realitykit-visionos` |
-| `advanced-swift-patterns` | `/plugin install skills@advanced-swift-patterns` |
-| `te-pattern` | `/plugin install skills@te-pattern` |
-| `te-shader` | `/plugin install skills@te-shader` |
-| `te-model` | `/plugin install skills@te-model` |
-| `te-show` | `/plugin install skills@te-show` |
-| `te-vehicle-bootstrap` | `/plugin install skills@te-vehicle-bootstrap` |
-| `sonic-pi` | `/plugin install skills@sonic-pi` |
-| `strudel` | `/plugin install skills@strudel` |
-| `github` | `/plugin install skills@github` |
+| `swift-concurrency` | `/plugin install swift-concurrency@skills` |
+| `swiftui-architecture` | `/plugin install swiftui-architecture@skills` |
+| `metal-graphics` | `/plugin install metal-graphics@skills` |
+| `realitykit-visionos` | `/plugin install realitykit-visionos@skills` |
+| `advanced-swift-patterns` | `/plugin install advanced-swift-patterns@skills` |
+| `te-pattern` | `/plugin install te-pattern@skills` |
+| `te-shader` | `/plugin install te-shader@skills` |
+| `te-model` | `/plugin install te-model@skills` |
+| `te-show` | `/plugin install te-show@skills` |
+| `te-vehicle-bootstrap` | `/plugin install te-vehicle-bootstrap@skills` |
+| `sonic-pi` | `/plugin install sonic-pi@skills` |
+| `strudel` | `/plugin install strudel@skills` |
+| `github` | `/plugin install github@skills` |
+| `idea-framing` | `/plugin install idea-framing@skills` |
 
 ### Codex
 
@@ -95,6 +102,7 @@ mkdir -p ~/.agents/skills
 | `sonic-pi` | `ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi` |
 | `strudel` | `ln -s ~/.codex/piemonte-skills/strudel ~/.agents/skills/strudel` |
 | `github` | `ln -s ~/.codex/piemonte-skills/github ~/.agents/skills/github` |
+| `idea-framing` | `ln -s ~/.codex/piemonte-skills/idea-framing ~/.agents/skills/idea-framing` |
 
 See each skill's `.codex/INSTALL.md` (e.g. [`swift-concurrency/.codex/INSTALL.md`](swift-concurrency/.codex/INSTALL.md)) for Windows instructions.
 

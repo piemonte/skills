@@ -1,0 +1,18 @@
+{
+  "name": "idea-framing",
+  "description": "Frame a concept using a five-section template — Concept, Problem, Why interesting, State of the art, Solution, Technical",
+  "version": "1.0.0",
+  "author": {
+    "name": "patrick piemonte"
+  },
+  "homepage": "https://github.com/piemonte/skills",
+  "repository": "https://github.com/piemonte/skills",
+  "license": "MIT",
+  "keywords": [
+    "ideation",
+    "framing",
+    "concept",
+    "thinking",
+    "writing"
+  ]
+}

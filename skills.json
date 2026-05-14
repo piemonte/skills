@@ -12,6 +12,12 @@
     "references": []
   },
   {
+    "name": "idea-framing",
+    "folder": "idea-framing",
+    "description": "Use when framing or developing a new concept \u2014 five-section template (Concept / Problem / Why interesting / State of the art / Solution / Technical), supports guided Q&A, structuring a rough dump, or critiquing a draft. Includes title suggestion.",
+    "references": []
+  },
+  {
     "name": "metal-graphics",
     "folder": "metal-graphics",
     "description": "Use when writing Metal GPU code \u2014 compute and render pipelines, buffer management, textures, IOSurface, compute dispatch, ring buffers, shaders, and frame pacing.",
