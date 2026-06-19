@@ -24,7 +24,6 @@ Skills for the [LXStudio-TE](https://github.com/titanicsend/LXStudio-TE) codebas
 |-------|-------------|
 | [`te-pattern`](te-pattern/) | Java LED pattern development — TEPerformancePattern, audio reactivity, color system, and variable-speed time |
 | [`te-shader`](te-shader/) | GLSL shader development — uniform reference, pragma system, audio textures, and auto-registration |
-| [`te-model`](te-model/) | Vehicle model definition — vertex/edge/panel file formats, DMX addressing, and Java model classes |
 | [`te-show`](te-show/) | Show file configuration — .lxp JSON structure, channel setup, and view definitions |
 | [`te-vehicle-bootstrap`](te-vehicle-bootstrap/) | End-to-end vehicle bootstrapping — geometry, fixtures, show files, test patterns, and troubleshooting |
 
@@ -70,7 +69,6 @@ Add the marketplace once, then install the skills you want.
 | `advanced-swift-patterns` | `/plugin install advanced-swift-patterns@skills` |
 | `te-pattern` | `/plugin install te-pattern@skills` |
 | `te-shader` | `/plugin install te-shader@skills` |
-| `te-model` | `/plugin install te-model@skills` |
 | `te-show` | `/plugin install te-show@skills` |
 | `te-vehicle-bootstrap` | `/plugin install te-vehicle-bootstrap@skills` |
 | `sonic-pi` | `/plugin install sonic-pi@skills` |
@@ -96,7 +94,6 @@ mkdir -p ~/.agents/skills
 | `advanced-swift-patterns` | `ln -s ~/.codex/piemonte-skills/advanced-swift-patterns ~/.agents/skills/advanced-swift-patterns` |
 | `te-pattern` | `ln -s ~/.codex/piemonte-skills/te-pattern ~/.agents/skills/te-pattern` |
 | `te-shader` | `ln -s ~/.codex/piemonte-skills/te-shader ~/.agents/skills/te-shader` |
-| `te-model` | `ln -s ~/.codex/piemonte-skills/te-model ~/.agents/skills/te-model` |
 | `te-show` | `ln -s ~/.codex/piemonte-skills/te-show ~/.agents/skills/te-show` |
 | `te-vehicle-bootstrap` | `ln -s ~/.codex/piemonte-skills/te-vehicle-bootstrap ~/.agents/skills/te-vehicle-bootstrap` |
 | `sonic-pi` | `ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi` |

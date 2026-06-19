@@ -54,12 +54,6 @@
     "references": []
   },
   {
-    "name": "te-model",
-    "folder": "te-model",
-    "description": "Use when working with LXStudio-TE vehicle models and fixture files \u2014 .lxf fixture format, vehicle architecture, edge/panel/window fixtures, transforms, ArtNet output, and Java model classes.",
-    "references": []
-  },
-  {
     "name": "te-pattern",
     "folder": "te-pattern",
     "description": "Use when creating Java LED patterns for LXStudio-TE \u2014 TEPerformancePattern, audio reactivity, color system, variable-speed time, common controls, and pattern organization.",

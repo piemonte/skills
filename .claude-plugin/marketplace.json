@@ -99,19 +99,6 @@
       "tags": ["glsl", "shaders", "lxstudio", "led", "gpu"]
     },
     {
-      "name": "te-model",
-      "source": "./te-model",
-      "description": "Vehicle model definition for LXStudio-TE with geometry, fixtures, and DMX addressing",
-      "version": "1.0.0",
-      "author": { "name": "patrick piemonte" },
-      "homepage": "https://github.com/piemonte/skills",
-      "repository": "https://github.com/piemonte/skills",
-      "license": "MIT",
-      "keywords": ["lxstudio", "model", "dmx", "led", "vehicle"],
-      "category": "creative-coding",
-      "tags": ["lxstudio", "model", "dmx", "led", "vehicle"]
-    },
-    {
       "name": "te-show",
       "source": "./te-show",
       "description": "Show file configuration for LXStudio-TE with channel setup and view definitions",
