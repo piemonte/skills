@@ -27,6 +27,14 @@ Skills for the [LXStudio-TE](https://github.com/titanicsend/LXStudio-TE) codebas
 | [`te-show`](te-show/) | Show file configuration — .lxp JSON structure, channel setup, and view definitions |
 | [`te-vehicle-bootstrap`](te-vehicle-bootstrap/) | End-to-end vehicle bootstrapping — geometry, fixtures, show files, test patterns, and troubleshooting |
 
+## Lighting — Apotheneum
+
+Skill for the [Apotheneum](https://github.com/Apotheneum/Apotheneum) installation (cube + cylinder) on Chromatik.
+
+| Skill | Description |
+|-------|-------------|
+| [`apotheneum-pattern`](apotheneum-pattern/) | Apotheneum LED pattern development — cube/cylinder geometry, doors, copy/mirror utilities, layers, MIDI, optional audio, and macro-knob control |
+
 ## Live Music Coding
 
 Skills for live coding music and algorithmic composition with [Sonic Pi](https://sonic-pi.net) and [Strudel](https://strudel.cc).
@@ -71,6 +79,7 @@ Add the marketplace once, then install the skills you want.
 | `te-shader` | `/plugin install te-shader@skills` |
 | `te-show` | `/plugin install te-show@skills` |
 | `te-vehicle-bootstrap` | `/plugin install te-vehicle-bootstrap@skills` |
+| `apotheneum-pattern` | `/plugin install apotheneum-pattern@skills` |
 | `sonic-pi` | `/plugin install sonic-pi@skills` |
 | `strudel` | `/plugin install strudel@skills` |
 | `github` | `/plugin install github@skills` |
@@ -96,6 +105,7 @@ mkdir -p ~/.agents/skills
 | `te-shader` | `ln -s ~/.codex/piemonte-skills/te-shader ~/.agents/skills/te-shader` |
 | `te-show` | `ln -s ~/.codex/piemonte-skills/te-show ~/.agents/skills/te-show` |
 | `te-vehicle-bootstrap` | `ln -s ~/.codex/piemonte-skills/te-vehicle-bootstrap ~/.agents/skills/te-vehicle-bootstrap` |
+| `apotheneum-pattern` | `ln -s ~/.codex/piemonte-skills/apotheneum-pattern ~/.agents/skills/apotheneum-pattern` |
 | `sonic-pi` | `ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi` |
 | `strudel` | `ln -s ~/.codex/piemonte-skills/strudel ~/.agents/skills/strudel` |
 | `github` | `ln -s ~/.codex/piemonte-skills/github ~/.agents/skills/github` |

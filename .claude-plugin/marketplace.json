@@ -125,6 +125,19 @@
       "tags": ["lxstudio", "vehicle", "bootstrap", "led", "setup"]
     },
     {
+      "name": "apotheneum-pattern",
+      "source": "./apotheneum-pattern",
+      "description": "Java LED pattern development for the Apotheneum installation — cube/cylinder geometry, doors, copy/mirror utilities, layers, MIDI, optional audio, macro-knob control, and the Chromatik package build/run flow",
+      "version": "1.0.0",
+      "author": { "name": "patrick piemonte" },
+      "homepage": "https://github.com/piemonte/skills",
+      "repository": "https://github.com/piemonte/skills",
+      "license": "MIT",
+      "keywords": ["java", "chromatik", "lx", "led", "apotheneum", "patterns"],
+      "category": "creative-coding",
+      "tags": ["java", "chromatik", "lx", "led", "apotheneum", "patterns"]
+    },
+    {
       "name": "sonic-pi",
       "source": "./sonic-pi",
       "description": "Live coding music with Sonic Pi — synthesis, samples, live_loop, FX, MIDI, and OSC",

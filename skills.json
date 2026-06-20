@@ -76,5 +76,11 @@
     "folder": "te-vehicle-bootstrap",
     "description": "Use when bootstrapping a new vehicle for LXStudio-TE \u2014 end-to-end guide covering geometry, fixtures, show files, test patterns, and troubleshooting.",
     "references": []
+  },
+  {
+    "name": "apotheneum-pattern",
+    "folder": "apotheneum-pattern",
+    "description": "Use when creating Java LED patterns for the Apotheneum installation \u2014 ApotheneumPattern/ApotheneumRasterPattern, cube/cylinder geometry, doors, copy/mirror utilities, layers, MIDI, optional audio, macro-knob control, and the Chromatik package build/run flow.",
+    "references": []
   }
 ]

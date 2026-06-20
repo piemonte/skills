@@ -1,0 +1,281 @@
+---
+name: apotheneum-pattern
+description: Use when creating Java LED patterns for the Apotheneum installation — ApotheneumPattern/ApotheneumRasterPattern, cube/cylinder geometry, doors, copy/mirror utilities, layers, MIDI, optional audio, macro-knob control, and the Chromatik package build/run flow.
+---
+
+# Apotheneum Pattern Development
+
+This reference covers writing Java LED patterns for **Apotheneum**, a visual/sonic/haptic installation built on the [Chromatik](https://chromatik.co/) (LX Studio) Digital Lighting Workstation.
+
+Apotheneum is a Chromatik **package** (an LXPackage), not a standalone app: patterns compile into a JAR that Chromatik loads from `~/Chromatik/Packages`. The installation is two nested chambers — a **cube** (4 faces, 50×45 each) enclosing a **cylinder** (120 columns × 43) — each with **exterior and interior** surfaces, 13,280 LED nodes total.
+
+New patterns go in package `apotheneum.piemonte` with `@LXCategory("Apotheneum/piemonte")`.
+
+- Geometry deep-dive: [`references/geometry.md`](references/geometry.md)
+- Build, install, and run Chromatik: [`references/build-and-run.md`](references/build-and-run.md)
+
+## Class Hierarchy
+
+```
+LXPattern (LX framework)
+└── ApotheneumPattern              geometry-aware base; guards on Apotheneum.exists
+    └── ApotheneumRasterPattern    2D Graphics2D / BufferedImage → cube faces
+LXEffect (LX framework)
+└── ApotheneumEffect               effects/filters over existing colors
+```
+
+| Extend… | When |
+|---|---|
+| `ApotheneumPattern` | Most patterns — cube/cylinder geometry, copy/mirror utilities, model-safety |
+| `ApotheneumRasterPattern` | 2D drawing with `Graphics2D`, mapped to faces with per-face toggles |
+| `ApotheneumEffect` | Filters/masks applied over whatever colors already exist (`render(deltaMs, enabledAmount)`) |
+| `LXPattern` (direct) | General 3D or specialized patterns that don't need Apotheneum utilities |
+
+**Almost all new patterns extend `ApotheneumPattern`** (or `ApotheneumRasterPattern` for 2D graphics).
+
+## Full Annotated Example
+
+```java
+package apotheneum.piemonte;
+
+import apotheneum.Apotheneum;
+import apotheneum.ApotheneumPattern;
+import heronarts.lx.LX;
+import heronarts.lx.LXCategory;
+import heronarts.lx.color.LXColor;
+import heronarts.lx.model.LXPoint;
+import heronarts.lx.parameter.CompoundParameter;
+
+@LXCategory("Apotheneum/piemonte")
+public class MyPattern extends ApotheneumPattern {
+
+  public final CompoundParameter speed =
+    new CompoundParameter("Speed", 1, 0.1, 5)
+    .setDescription("Animation speed");
+
+  private double phase = 0;
+
+  public MyPattern(LX lx) {
+    super(lx);                          // calls Apotheneum.initialize(lx)
+    addParameter("speed", this.speed);  // every parameter must be registered
+  }
+
+  @Override
+  protected void render(double deltaMs) {   // only called when Apotheneum.exists
+    setColors(LXColor.BLACK);               // start from black each frame
+    this.phase += deltaMs * 0.001 * this.speed.getValue();
+
+    for (Apotheneum.Cylinder.Ring ring : Apotheneum.cylinder.exterior.rings) {
+      for (LXPoint p : ring.points) {
+        double b = 50 + 50 * Math.sin(this.phase + p.yn * Math.PI * 2);
+        colors[p.index] = LXColor.gray(b);
+      }
+    }
+    copyExterior();   // mirror exterior → interior (cube + cylinder)
+  }
+}
+```
+
+Key points: extend `ApotheneumPattern`, register every parameter in the constructor, implement `render(double deltaMs)` (the base class only calls it when `Apotheneum.exists`, otherwise it blacks out), write into `colors[p.index]`, and use the copy utilities for symmetry.
+
+## Geometry (summary)
+
+Full detail in [`references/geometry.md`](references/geometry.md). The essentials:
+
+- `Apotheneum.cube` and `Apotheneum.cylinder`; each has `.exterior` and `.interior` orientations (interior may be null — check `Apotheneum.hasInterior`).
+- **Cube:** `cube.exterior.faces[]` = `{front, right, back, left}` (clockwise from above); each `Face` has `columns[]` (50) and `rows[]` (45). The orientation also exposes a combined `columns[]` (200) and `rings[]` (`Cube.Ring.LENGTH = 200`).
+- **Cylinder:** `cylinder.exterior.columns[]` (120, `Cylinder.Ring.LENGTH = 120`) and `rings[]`; height `CYLINDER_HEIGHT = 43`.
+- Access points: `orientation.point(x, y)` == `orientation.column(x).points[y]`. **Y = 0 is the top** of a column.
+- Normalized coordinates on every `LXPoint`: `p.xn`, `p.yn`, `p.zn` in 0..1 (subtract 0.5 to center).
+- **Doors** shorten some columns. Use `orientation.available(columnIndex)` for the real number of lit points in a column — never assume full height. Cube doors are at local columns 20–29; cylinder doors repeat every 30 columns at offset 10–19.
+- `Column`/`Row`/`Ring` share `Apotheneum.Sequence` (each exposes `.index`). Newer builds add infinite-canvas wrapping — `next()`/`previous()` on sequences and `.column(i, true)`/`.ring(i, true)` on Orientation/Face (verify availability in your checkout). See [`references/geometry.md`](references/geometry.md).
+
+## Copy & Mirror Utilities (on `ApotheneumPattern`)
+
+| Method | Effect |
+|---|---|
+| `copyExterior()` | Copy exterior → interior for **both** cube and cylinder |
+| `copyCubeExterior()` / `copyCylinderExterior()` | One component only |
+| `copyCubeFace(Face from)` | Copy one face to all 8 faces (4 exterior + 4 interior) |
+| `copyMirror(Face from, Face to)` | Mirror copy (reverses column order) |
+| `setApotheneumColor(int color)` | Fill the entire installation with one color |
+| `copy(Orientation from, Orientation to)`, `copy(Face from, Face to)` | Bulk color-range copy (fast `System.arraycopy`) |
+| `setColor(...)` overloads | Fill a component/orientation/face/column with a color |
+
+Typical pattern: render one face or the exterior surfaces, then `copyCubeFace(...)` / `copyExterior()` to propagate. This is both DRY and fast (array copies, not per-point loops).
+
+## Raster Patterns (`ApotheneumRasterPattern`)
+
+For 2D graphics, extend `ApotheneumRasterPattern` and draw on a `Graphics2D`. The canvas is `RASTER_WIDTH × RASTER_HEIGHT` = `50 × 45` (one cube face). The framework maps the raster onto whichever faces are enabled by the per-face `BooleanParameter`s (`exteriorFront`…`interiorLeft`).
+
+```java
+package apotheneum.piemonte;
+
+import apotheneum.ApotheneumRasterPattern;
+import heronarts.lx.LX;
+import heronarts.lx.LXCategory;
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+@LXCategory("Apotheneum/piemonte")
+public class MyRaster extends ApotheneumRasterPattern {
+
+  public MyRaster(LX lx) { super(lx); }
+
+  @Override
+  protected void render(double deltaMs, Graphics2D g) {
+    clear();                       // clear the 50×45 canvas to black (or clear(Color))
+    g.setColor(Color.RED);
+    g.fillOval(10, 10, 20, 20);    // drawn to every enabled face
+  }
+}
+```
+
+Use `buildFaceControls(ui, uiDevice, size)` to add the standard face-selector UI (a grid of exterior/interior face toggles).
+
+## Color
+
+Write 32-bit ARGB ints into `colors[p.index]`:
+
+| Call | Meaning |
+|---|---|
+| `LXColor.gray(double v)` | Grayscale, `v` in 0..100 |
+| `LXColor.grayn(double v)` | Grayscale, `v` in 0..1 |
+| `LXColor.rgb(int r, int g, int b)` | RGB, each 0..255 |
+| `LXColor.hsb(float h, float s, float b)` | HSB |
+| `LXColor.lightest(int a, int b)` | Additive-max blend (use when overlapping shapes shouldn't darken) |
+
+- `setColors(LXColor.BLACK)` clears all points; `addColor(p.index, c)` adds (useful in layers).
+- For palette-aware color, read the project palette via the LX swatch/`LXSwatch` API rather than hardcoding hues — this lets patterns follow the show's palette.
+
+## Parameters & UI
+
+Declare parameters as `public final` fields and **register each one** in the constructor with `addParameter("key", param)` (key is the lowercase field name). Types seen across the codebase:
+
+`CompoundParameter`, `BooleanParameter`, `TriggerParameter`, `EnumParameter<T>`, `DiscreteParameter`, `CompoundDiscreteParameter`, `ObjectParameter<T>`, `FunctionalParameter`.
+
+```java
+public final CompoundParameter size =
+  new CompoundParameter("Size", 1, 0.1, 10)
+  .setUnits(CompoundParameter.Units.INTEGER)
+  .setDescription("Element size");
+
+public final BooleanParameter cylinder =
+  new BooleanParameter("Cylinder", true).setDescription("Render to cylinder");
+```
+
+Set good defaults, ranges, units, and `.setDescription(...)` — see the control philosophy below for why this matters.
+
+For a custom device UI, `implements UIDeviceControls<MyPattern>` and override `buildDeviceControls(UI ui, UIDevice uiDevice, MyPattern pattern)`, using helpers like `newKnob(param)`, `newButton(param)`, `newIntegerBox(param)`, `addColumn(container, title, ...children)`, `addVerticalBreak(ui, uiDevice)`. **Max 3 controls per UI column** (project convention — keeps the device panel readable).
+
+## Layers (particle / entity systems)
+
+For independent moving entities, use `LXLayer` inner classes. The host adds layers and composites in `afterLayers`:
+
+```java
+private class Particle extends LXLayer {
+  private double life = 2000;  // ms
+  Particle(LX lx) { super(lx); }
+
+  @Override
+  public void run(double deltaMs) {
+    this.life -= deltaMs;
+    if (this.life < 0) { remove(); return; }   // self-destruct when done
+    // update position, then write additively, e.g. addColor(p.index, c)
+  }
+}
+
+@Override
+protected void render(double deltaMs) {
+  setColors(LXColor.BLACK);
+  if (/* spawn condition */ true) {
+    addLayer(new Particle(this.lx));
+  }
+}
+
+@Override
+protected void afterLayers(double deltaMs) {
+  copyExterior();   // composite once, after all layers have run
+}
+```
+
+`Raindrops`, `Gravity`, `Wormhole`, and `CubeBlinks` are good in-repo references for this pattern.
+
+## MIDI
+
+To respond to MIDI notes, `implements ApotheneumPattern.Midi` and override `noteOnReceived`:
+
+```java
+public class MyTrig extends ApotheneumPattern implements ApotheneumPattern.Midi {
+  @Override
+  public void noteOnReceived(heronarts.lx.midi.MidiNoteOn midiNote) {
+    // trigger a one-shot effect
+  }
+
+  @Override
+  protected void render(double deltaMs) { /* ... */ }
+}
+```
+
+## Time, Modulators & Performance
+
+- Convert frame time to seconds with `deltaMs * 0.001`. Accumulate phase manually (`phase += deltaMs * 0.001 * speed`) so a bipolar speed control can reverse direction.
+- Use LX modulators for periodic motion: `SawLFO`, `SinLFO`, etc. Start them in the constructor with `startModulator(modulator)`. A modulator's period can be driven by a parameter via `FunctionalParameter.create(() -> ...)`.
+- Global wall-clock time is `lx.engine.nowMillis`.
+- Precompute sin/cos lookup tables for hot inner loops.
+
+**Performance & threading (from the project CLAUDE.md):**
+- LX renders patterns on a single thread — **never use `synchronized`**; it only adds overhead.
+- Don't allocate collections inside `render()` (it runs at 60+ FPS) — reuse/`clear()` pre-allocated structures or primitive arrays.
+- No manual "is enabled" checks — the framework only calls `render()` on the active pattern.
+
+## Audio (optional, per-pattern)
+
+Apotheneum patterns are **not** audio-reactive in code by default; audio is normally wired at the project level (see the next section). Add code-level audio only when a pattern genuinely needs sample-accurate reaction.
+
+- Amplitude/spectrum: `lx.engine.audio.meter` is a `GraphicMeter` — read per-band energy (e.g. `getBandf(i)`), overall level, and normalized values from it.
+- Tempo/beats: `lx.engine.tempo` exposes BPM, beat basis, and beat events.
+
+Verify the exact method signatures against the `lx` jar when you implement (the LX audio API is a provided dependency, not in this repo) — see [`references/build-and-run.md`](references/build-and-run.md) for resolving the classpath.
+
+## Live Control & VJing — Macro Knobs + Modulation Mapping
+
+Apotheneum deliberately has **no TE-style "common controls" framework baked into patterns**. The recommended way to get a consistent set of "common parameters" across many patterns is at the **project level**, not in code:
+
+> Use a **Macro Knobs modulator** to create the set of "common parameters," then use **modulation mapping** to map those macro parameters to the appropriate parameters of the patterns/effects in the project. For live VJing/busking, set up a simple controller bound to those macro knobs — they'll always roughly do what you expect, without requiring complex coordination across pattern implementations to conform to precise conventions.
+
+What this means for how you author patterns:
+
+- **Expose clean, well-named, sensibly-ranged `LXParameter`s** (good defaults, min/max, units, `.setDescription`). A parameter's *mappability* matters more than naming it to match a global convention.
+- **Don't** invent a fixed cross-pattern control vocabulary in Java, and **don't** add a shared base class to enforce one — modulation mapping handles cross-pattern control externally.
+- Audio reactivity is wired the same way by default: an audio modulator → macro/parameter via modulation mapping; reach for code-level audio only when needed.
+
+Worked example: add a **Macro Knobs** modulator in the project → map one macro knob to several patterns' Speed/Size/Brightness-type params via modulation mapping → bind a MIDI controller to the macro knobs.
+
+## Build & Run (summary)
+
+Full detail in [`references/build-and-run.md`](references/build-and-run.md).
+
+- Build + install: `mvn -Pinstall install` (or `./update.command`). This copies the JAR to `~/Chromatik/Packages`, where Chromatik auto-loads it. Use `mvn compile` for a quick compile check.
+- Logs: `~/Chromatik/Logs`. Always log with `LX.log(...)` / `LX.error(...)` — `System.out.println` does **not** appear in Chromatik logs.
+- Running Chromatik standalone (dev) needs the EULA accepted and (on macOS) `-XstartOnFirstThread`; network output to hardware is license-gated.
+
+## Conventions & New-Pattern Checklist
+
+Conventions:
+- Package `apotheneum.piemonte`; `@LXCategory("Apotheneum/piemonte")`.
+- Copyright header optional (the `mcslee` patterns carry the LX license header).
+- camelCase parameter fields; the `addParameter` key equals the field name.
+- ≤ 3 controls per UI column.
+
+Checklist for a new pattern:
+1. Create the file in `src/main/java/apotheneum/piemonte/`.
+2. Add `@LXCategory("Apotheneum/piemonte")`.
+3. Extend `ApotheneumPattern` (or `ApotheneumRasterPattern` for 2D).
+4. Declare parameters and `addParameter(...)` each, with ranges/units/descriptions.
+5. Override `render(double deltaMs)` (or `render(double deltaMs, Graphics2D g)`).
+6. Write colors into `colors[p.index]`; respect `available(col)` near doors.
+7. Use `copyExterior()` / `copyCubeFace(...)` for symmetry instead of re-rendering.
+8. `mvn -Pinstall install`, then confirm it loads in Chromatik (`~/Chromatik/Logs`).
+
+See `docs/PATTERNS_ROADMAP.md` for the backlog of planned patterns.
