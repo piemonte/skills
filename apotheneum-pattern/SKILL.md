@@ -13,6 +13,7 @@ New patterns go in package `apotheneum.piemonte` with `@LXCategory("Apotheneum/p
 
 - Geometry deep-dive: [`references/geometry.md`](references/geometry.md)
 - Build, install, and run Chromatik: [`references/build-and-run.md`](references/build-and-run.md)
+- Chromatik concepts (views, compositing, modulation, palette, audio): [`references/chromatik-guide.md`](references/chromatik-guide.md)
 
 ## Class Hierarchy
 
@@ -90,6 +91,16 @@ Full detail in [`references/geometry.md`](references/geometry.md). The essential
 - **Doors** shorten some columns. Use `orientation.available(columnIndex)` for the real number of lit points in a column — never assume full height. Cube doors are at local columns 20–29; cylinder doors repeat every 30 columns at offset 10–19.
 - `Column`/`Row`/`Ring` share `Apotheneum.Sequence` (each exposes `.index`). Newer builds add infinite-canvas wrapping — `next()`/`previous()` on sequences and `.column(i, true)`/`.ring(i, true)` on Orientation/Face (verify availability in your checkout). See [`references/geometry.md`](references/geometry.md).
 
+## Views & Surface Targeting
+
+Chromatik **Views** scope a channel or device to a subset of the model — this is how artists put content on specific surfaces (interior/exterior, cube/cylinder, a single face). The example Apotheneum project ships views for the common subdivisions. Views are chosen in the UI (channel default, or the per-device View selector); selector syntax matches fixture tags (e.g. `cube exterior`, `interior , cylinder`).
+
+**Important nuance:** patterns that use the global `Apotheneum.cube` / `Apotheneum.cylinder` helpers and write to absolute `colors[p.index]` indices render to those surfaces **regardless of the channel view** — they are *not* auto-scoped by it. So:
+- Scope surfaces **in code**: pick `exterior` vs `interior`, choose which faces/orientations to write, use the `ApotheneumRasterPattern` per-face toggles, or `copyExterior()` / `copyCubeFace()`.
+- Reserve Views for `model.points`-style patterns and for show routing.
+
+Selector syntax + details: [`references/chromatik-guide.md`](references/chromatik-guide.md).
+
 ## Copy & Mirror Utilities (on `ApotheneumPattern`)
 
 | Method | Effect |
@@ -146,7 +157,7 @@ Write 32-bit ARGB ints into `colors[p.index]`:
 | `LXColor.lightest(int a, int b)` | Additive-max blend (use when overlapping shapes shouldn't darken) |
 
 - `setColors(LXColor.BLACK)` clears all points; `addColor(p.index, c)` adds (useful in layers).
-- For palette-aware color, read the project palette via the LX swatch/`LXSwatch` API rather than hardcoding hues — this lets patterns follow the show's palette.
+- Palette-aware color: the project **Color Palette** holds swatches of up to 5 colors; the **Active Swatch** is what devices draw from (configurable start index + number of stops, with RGB/HSV blend modes for gradients). Prefer a palette-linked color parameter over hardcoded hues so patterns follow the show's color story. See [`references/chromatik-guide.md`](references/chromatik-guide.md).
 
 ## Parameters & UI
 
@@ -231,12 +242,15 @@ public class MyTrig extends ApotheneumPattern implements ApotheneumPattern.Midi 
 
 ## Audio (optional, per-pattern)
 
-Apotheneum patterns are **not** audio-reactive in code by default; audio is normally wired at the project level (see the next section). Add code-level audio only when a pattern genuinely needs sample-accurate reaction.
+Apotheneum patterns are **not** audio-reactive in code by default; audio is normally wired at the project level as modulation (see the next section). Add code-level audio only when a pattern genuinely needs sample-accurate reaction.
 
-- Amplitude/spectrum: `lx.engine.audio.meter` is a `GraphicMeter` — read per-band energy (e.g. `getBandf(i)`), overall level, and normalized values from it.
+Chromatik exposes audio as modulation sources: a **Graphic Meter** with **16 frequency bands**, a **Decibel Meter** (overall level), and a **Beat Detect** modulator (Trigger / Average / a decaying Beat ramp, with Min/Max freq). Map any of these to parameters via ⌘M.
+
+In code:
+- Spectrum/level: `lx.engine.audio.meter` is a `GraphicMeter` (16 bands) — read per-band energy (e.g. `getBandf(i)`), overall level, and normalized values.
 - Tempo/beats: `lx.engine.tempo` exposes BPM, beat basis, and beat events.
 
-Verify the exact method signatures against the `lx` jar when you implement (the LX audio API is a provided dependency, not in this repo) — see [`references/build-and-run.md`](references/build-and-run.md) for resolving the classpath.
+Verify exact method signatures against the `lx` jar (it's a provided dependency, not in this repo) — see [`references/build-and-run.md`](references/build-and-run.md).
 
 ## Live Control & VJing — Macro Knobs + Modulation Mapping
 
@@ -251,6 +265,10 @@ What this means for how you author patterns:
 - Audio reactivity is wired the same way by default: an audio modulator → macro/parameter via modulation mapping; reach for code-level audio only when needed.
 
 Worked example: add a **Macro Knobs** modulator in the project → map one macro knob to several patterns' Speed/Size/Brightness-type params via modulation mapping → bind a MIDI controller to the macro knobs.
+
+**Mapping workflow:** press **⌘M** (Parameter Map) — eligible sources highlight green, destinations blue; click source then target. ⌘-drag a target knob/slider to set modulation depth; choose Unipolar or Bipolar polarity. Audio meters and Beat Detect map the same way.
+
+**Compositing:** a channel can run in **Composite mode**, where patterns blend top-to-bottom like a mini-mixer (per-pattern Composite Level + Composite Blend). When authoring a foreground/overlay pattern, leave unlit pixels `LXColor.BLACK` so layers beneath show through. See [`references/chromatik-guide.md`](references/chromatik-guide.md).
 
 ## Build & Run (summary)
 
