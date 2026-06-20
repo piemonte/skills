@@ -18,14 +18,13 @@ Focused skills for building production-quality software on Apple platforms — S
 
 ## Lighting — Chromatix / LXStudio-TE
 
-Skills for the [LXStudio-TE](https://github.com/titanicsend/LXStudio-TE) codebase, the LED art vehicle platform powering [Titanic's End](https://www.titanicsend.com) and adaptable vehicles like Mothership. These cover Java pattern development, GLSL GPU shaders, 3D vehicle model definition, show file configuration, and end-to-end vehicle bootstrapping.
+Skills for the [LXStudio-TE](https://github.com/titanicsend/LXStudio-TE) codebase, the LED art vehicle platform powering [Titanic's End](https://www.titanicsend.com) and adaptable vehicles like Mothership. These cover Java pattern development, GLSL GPU shaders, and show file configuration.
 
 | Skill | Description |
 |-------|-------------|
 | [`te-pattern`](te-pattern/) | Java LED pattern development — TEPerformancePattern, audio reactivity, color system, and variable-speed time |
 | [`te-shader`](te-shader/) | GLSL shader development — uniform reference, pragma system, audio textures, and auto-registration |
 | [`te-show`](te-show/) | Show file configuration — .lxp JSON structure, channel setup, and view definitions |
-| [`te-vehicle-bootstrap`](te-vehicle-bootstrap/) | End-to-end vehicle bootstrapping — geometry, fixtures, show files, test patterns, and troubleshooting |
 
 ## Lighting — Apotheneum
 
@@ -78,7 +77,6 @@ Add the marketplace once, then install the skills you want.
 | `te-pattern` | `/plugin install te-pattern@skills` |
 | `te-shader` | `/plugin install te-shader@skills` |
 | `te-show` | `/plugin install te-show@skills` |
-| `te-vehicle-bootstrap` | `/plugin install te-vehicle-bootstrap@skills` |
 | `apotheneum-pattern` | `/plugin install apotheneum-pattern@skills` |
 | `sonic-pi` | `/plugin install sonic-pi@skills` |
 | `strudel` | `/plugin install strudel@skills` |
@@ -104,7 +102,6 @@ mkdir -p ~/.agents/skills
 | `te-pattern` | `ln -s ~/.codex/piemonte-skills/te-pattern ~/.agents/skills/te-pattern` |
 | `te-shader` | `ln -s ~/.codex/piemonte-skills/te-shader ~/.agents/skills/te-shader` |
 | `te-show` | `ln -s ~/.codex/piemonte-skills/te-show ~/.agents/skills/te-show` |
-| `te-vehicle-bootstrap` | `ln -s ~/.codex/piemonte-skills/te-vehicle-bootstrap ~/.agents/skills/te-vehicle-bootstrap` |
 | `apotheneum-pattern` | `ln -s ~/.codex/piemonte-skills/apotheneum-pattern ~/.agents/skills/apotheneum-pattern` |
 | `sonic-pi` | `ln -s ~/.codex/piemonte-skills/sonic-pi ~/.agents/skills/sonic-pi` |
 | `strudel` | `ln -s ~/.codex/piemonte-skills/strudel ~/.agents/skills/strudel` |
