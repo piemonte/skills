@@ -16,6 +16,10 @@ Everything a pattern needs to address LEDs on the cube and cylinder. All facts a
 | `Cube.DOOR_START_COLUMN` | 20 | First door column on each face |
 | `Cylinder.DOOR_START_COLUMN` | 10 | First door column in each 30-col group |
 
+## Physical nesting
+
+The cylinder is **concentric inside** the cube — both centered at `cubeSide*0.5` ≈ (245.5", 245.5") (`Apotheneum.lxf:291-292`). Cube side 491"; cylinder radius 180" (Ø 360"), leaving a ~65" annular gap to each cube wall. Both nets hang from near the top (cube top 444"; cylinder top ≈ 425.25"), so they are roughly **bottom-aligned with tops offset by ~2 nodes**. The 4 doors on each structure are cardinally aligned (0°/90°/180°/270°). Co-rotating (CW from above) but **column 0 differs** between structures — align cross-structure work by world coords / normalized angle, not raw index. Techniques that exploit all this: [`geometry-complements.md`](geometry-complements.md).
+
 ## Object model
 
 ```

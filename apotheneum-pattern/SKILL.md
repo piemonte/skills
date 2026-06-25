@@ -12,6 +12,7 @@ Apotheneum is a Chromatik **package** (an LXPackage), not a standalone app: patt
 New patterns go in package `apotheneum.piemonte` with `@LXCategory("Apotheneum/piemonte")`.
 
 - Geometry deep-dive: [`references/geometry.md`](references/geometry.md)
+- Geometry complements (cube↔cylinder, interior/exterior techniques): [`references/geometry-complements.md`](references/geometry-complements.md)
 - Build, install, and run Chromatik: [`references/build-and-run.md`](references/build-and-run.md)
 - Chromatik concepts (views, compositing, modulation, palette, audio): [`references/chromatik-guide.md`](references/chromatik-guide.md)
 
@@ -114,6 +115,21 @@ Selector syntax + details: [`references/chromatik-guide.md`](references/chromati
 | `setColor(...)` overloads | Fill a component/orientation/face/column with a color |
 
 Typical pattern: render one face or the exterior surfaces, then `copyCubeFace(...)` / `copyExterior()` to propagate. This is both DRY and fast (array copies, not per-point loops).
+
+## Geometry Complements (use the nested chambers)
+
+The cylinder sits **concentrically inside** the cube (shared center, cylinder radius ~180" vs cube half-side ~245", roughly bottom-aligned, 4 cardinally-aligned doors). Patterns that exploit this relationship feel native to the sculpture. A few signature moves — full catalog + verified facts + code in [`references/geometry-complements.md`](references/geometry-complements.md):
+
+- **Cube glow complements the cylinder** — measure the cylinder (mean brightness / fill / dominant hue) in one pass, then wash the cube exterior with a complementary tone modulated by it, so the outer chamber responds to the inner one.
+- **Continuous vertical journey** — stack heights so a wave crosses cube→cylinder as one axis (`mcslee/Wormhole`).
+- **Concentric radial expansion** — a true 3D ring from the shared axis (world coords) lights the cylinder, then the cube.
+- **Interior/exterior counterpoint** — render the two surfaces with *complementary* schemes (cool out / warm in); do **not** `copyExterior()` when they should differ (`piemonte/ComeUp`).
+- **Cardinal door portals** — emanate from / connect the 4 aligned doors (`mcslee/DoorEmanation`, `Portals`).
+- **Angular correspondence** — sweep around cube (200) and cylinder (120) in lockstep by normalized angle, not raw index (origins differ).
+- **Radial/mirror symmetry** — fold a source kaleidoscopically with `copyMirror` / segment copies (`mcslee/Symmetry`).
+- **Depth layering** — cylinder as foreground against a cube wash reads as depth, especially with channel composite mode.
+
+Vertical caveat: **Y=0 is the top** and the cylinder top is ~2 nodes below the cube top — align cross-structure vertical effects by the bottom (or world `p.y`), not row index 0.
 
 ## Raster Patterns (`ApotheneumRasterPattern`)
 
