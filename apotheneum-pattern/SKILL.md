@@ -232,6 +232,8 @@ Two gotchas this base encapsulates so subclasses can't trip on them:
 - **`LinkedColorParameter.setMode(PALETTE)` must be called AFTER `addParameter`** — in a field initializer the parameter has no parent/LX yet and `setMode` throws an NPE (crashes the pattern when added in Chromatik). Centralizing it here fixes it once.
 - **`CompoundParameter` ranges are fixed at construction** (no `setRange`), so per-pattern speed/size ranges flow through the base constructor.
 
+The base also exposes small convenience getters — `getColor()` (resolved palette color), `getSpeed()`, `getSize()` — so subclass render code reads cleanly. To customize an inherited param's curve or units, call the chainable setters directly on the field in your constructor (lx 1.2.1 has `setExponent`/`setUnits` but **no** `setRange`/`setLabel`), e.g. `this.speed.setExponent(2)` or `this.size.setUnits(LXParameter.Units.INTEGER)`.
+
 Multi-color patterns (e.g. two tides, interior/exterior schemes) use the inherited `color` as their **primary** slot and register extra `LinkedColorParameter`s *after* the canonical triple (each still needs its own `setMode` after `addParameter`).
 
 ## Layers (particle / entity systems)
