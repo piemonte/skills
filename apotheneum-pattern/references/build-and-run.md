@@ -31,15 +31,19 @@ mvn -q dependency:build-classpath \
   -Dmdep.outputFile=/tmp/apoth_cp.txt
 
 # Launch (macOS requires -XstartOnFirstThread for GLFW)
-java -XstartOnFirstThread --accept-eula \
+# --accept-eula and the optional project file are PROGRAM args: they go AFTER
+# the main class. Placing --accept-eula before -cp makes the JVM reject it
+# ("Unrecognized option: --accept-eula").
+java -XstartOnFirstThread \
   -cp "$(cat /tmp/apoth_cp.txt)" \
-  heronarts.lx.studio.Chromatik
+  heronarts.lx.studio.Chromatik --accept-eula
 ```
 
 Notes:
 - Main class: `heronarts.lx.studio.Chromatik`. Renderer is BGFX/Metal on Apple Silicon.
 - macOS needs `-XstartOnFirstThread` or GLFW window creation fails.
-- The engine is **disabled until the EULA is accepted** — pass `--accept-eula` (or accept in-app). EULA: <https://chromatik.co/license/>.
+- The engine is **disabled until the EULA is accepted** — pass `--accept-eula` as a **program arg (after the main class)**, or accept in-app. EULA: <https://chromatik.co/license/>.
+- The Apotheneum **model itself is license-gated**: without a developer license the model may not authorize, so `Apotheneum.exists` stays false and patterns render black. Visual testing needs a licensed Chromatik with the model loaded.
 - Without a developer license: features are limited and **network output (ArtNet/sACN) is gated** — fine for on-screen simulation, not for driving hardware.
 - The Apotheneum package auto-loads from `~/Chromatik/Packages`; confirm via the log line `Loading package content from: …/apotheneum-<version>.jar`.
 

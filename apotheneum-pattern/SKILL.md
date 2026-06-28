@@ -195,6 +195,45 @@ Set good defaults, ranges, units, and `.setDescription(...)` — see the control
 
 For a custom device UI, `implements UIDeviceControls<MyPattern>` and override `buildDeviceControls(UI ui, UIDevice uiDevice, MyPattern pattern)`, using helpers like `newKnob(param)`, `newButton(param)`, `newIntegerBox(param)`, `addColumn(container, title, ...children)`, `addVerticalBreak(ui, uiDevice)`. **Max 3 controls per UI column** (project convention — keeps the device panel readable).
 
+### Parameter ordering & a personal base class
+
+`addParameter(...)` **call order is the de facto ordering** — it determines where controls appear in the device UI and on MIDI/remote surfaces (there is no `setRemoteControls` in this codebase). So a consistent leading order makes your whole body of work feel predictable to operate.
+
+Recommended canonical lead: **`color`, `speed`, `size`, then pattern-specific**. The cleanest way to enforce it is a small **intermediate base class** that registers those three first; concrete patterns extend it and add the rest after `super(...)`. `mcslee/Bursts` is the in-repo precedent (abstract base → `CubeBursts`/`CylinderBursts`); `piemonte/ParameterPattern` is the example for this convention (`ApotheneumPattern → ParameterPattern → your pattern`).
+
+Why **per-author / self-contained**, not one shared global base: on a compressed timeline it's safest for each person to roll their own — then last-minute changes are self-contained and don't ripple across other artists' content. (Sync conventions later in a "where did you put what parameter" pass.)
+
+```java
+public abstract class ParameterPattern extends ApotheneumPattern {
+  public final LinkedColorParameter color =
+    new LinkedColorParameter("Color").setDescription("Primary color (follows the palette)");
+  public final CompoundParameter speed;
+  public final CompoundParameter size;
+
+  protected ParameterPattern(LX lx) { this(lx, 0.4, -1, 1, 0.5, 0, 1); }
+
+  // CompoundParameter ranges are immutable after construction, so pass them in.
+  protected ParameterPattern(LX lx,
+      double speedDef, double speedMin, double speedMax,
+      double sizeDef, double sizeMin, double sizeMax) {
+    super(lx);
+    this.speed = new CompoundParameter("Speed", speedDef, speedMin, speedMax).setDescription("Animation speed");
+    if (speedMin < 0) this.speed.setPolarity(CompoundParameter.Polarity.BIPOLAR);
+    this.size = new CompoundParameter("Size", sizeDef, sizeMin, sizeMax).setDescription("Element size");
+    addParameter("color", this.color);   // canonical order: color, speed, size
+    addParameter("speed", this.speed);
+    addParameter("size", this.size);
+    this.color.setMode(LinkedColorParameter.Mode.PALETTE); // see gotcha below
+  }
+}
+```
+
+Two gotchas this base encapsulates so subclasses can't trip on them:
+- **`LinkedColorParameter.setMode(PALETTE)` must be called AFTER `addParameter`** — in a field initializer the parameter has no parent/LX yet and `setMode` throws an NPE (crashes the pattern when added in Chromatik). Centralizing it here fixes it once.
+- **`CompoundParameter` ranges are fixed at construction** (no `setRange`), so per-pattern speed/size ranges flow through the base constructor.
+
+Multi-color patterns (e.g. two tides, interior/exterior schemes) use the inherited `color` as their **primary** slot and register extra `LinkedColorParameter`s *after* the canonical triple (each still needs its own `setMode` after `addParameter`).
+
 ## Layers (particle / entity systems)
 
 For independent moving entities, use `LXLayer` inner classes. The host adds layers and composites in `afterLayers`:
