@@ -1,12 +1,21 @@
 # skills
 
-My public collection of agentic skills for creative coding and development.
+My public collection of agentic skills for creative coding, ideation, and development — spanning Apple platform engineering, LED lighting art, live music coding, and general developer tooling.
 
 Each skill is a self-contained directory with a `SKILL.md` entry point, installable in both [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [Codex](https://openai.com/index/introducing-codex/).
 
-## Apple Platform Engineering
+## Categories
 
-Focused skills for building production-quality software on Apple platforms — Swift 6, SwiftUI, Metal, RealityKit, and visionOS.
+- [Apple Engineer Superpowers](#apple-engineer-superpowers) — Swift 6, SwiftUI, Metal, RealityKit, and visionOS
+- [Lighting — LXStudio-TE](#lighting--lxstudio-te) — Java patterns, GLSL shaders, and show files for Titanic's End
+- [Lighting — Apotheneum](#lighting--apotheneum) — LED patterns for the Apotheneum installation on Chromatik
+- [Live Music Coding](#live-music-coding) — Sonic Pi and Strudel live coding
+- [Developer Tools](#developer-tools) — GitHub CLI workflows
+- [Thinking & Ideation](#thinking--ideation) — concept framing
+
+## Apple Engineer Superpowers
+
+Focused skills for building production-quality software on Apple platforms — Swift 6, SwiftUI, Metal, RealityKit, and visionOS. This section is a clone of my [**apple-engineer-superpowers**](https://github.com/piemonte/apple-engineer-superpowers) repo, packaged here alongside my other skills.
 
 | Skill | Description |
 |-------|-------------|
@@ -16,7 +25,7 @@ Focused skills for building production-quality software on Apple platforms — S
 | [`realitykit-visionos`](realitykit-visionos/) | Entity-component-system architecture, custom Systems, immersive spaces, hand tracking, and multi-window scenes |
 | [`advanced-swift-patterns`](advanced-swift-patterns/) | Property wrappers, interpolation/animation primitives, custom collections, Combine bridging, and async abstractions |
 
-## Lighting — Chromatix / LXStudio-TE
+## Lighting — LXStudio-TE
 
 Skills for the [LXStudio-TE](https://github.com/titanicsend/LXStudio-TE) codebase, the LED art vehicle platform powering [Titanic's End](https://www.titanicsend.com) and adaptable vehicles like Mothership. These cover Java pattern development, GLSL GPU shaders, and show file configuration.
 
