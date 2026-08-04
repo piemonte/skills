@@ -297,6 +297,17 @@ public class MyTrig extends ApotheneumPattern implements ApotheneumPattern.Midi 
 - Don't allocate collections inside `render()` (it runs at 60+ FPS) — reuse/`clear()` pre-allocated structures or primitive arrays.
 - No manual "is enabled" checks — the framework only calls `render()` on the active pattern.
 
+**Optimization playbook** — deep techniques from the upstream `*Optimized` variants (compute one
+reference face and blit ×4, partial caching, hoisting frame-invariants into pixel-function args,
+`removeIf` compaction, object pools, primitive index arrays, spatial hashing, exact-math trig
+elimination, phase-wrap hygiene): [`references/performance.md`](references/performance.md).
+Key lifecycle gotchas that cause real bugs:
+- **`LXPattern.enabled` is compositing eligibility, not "am I rendering"** — track activation via
+  `onActive()`/`onInactive()` and drop MIDI/trigger input while inactive.
+- Rebuild model-derived caches in `onModelChanged(LXModel)`; size them off `model.points.length`
+  (the `colors` array does not exist at construction time).
+- `LXColor.hsb()` does not clamp — negative brightness wraps into corrupted bright colors.
+
 ## Audio (optional, per-pattern)
 
 Apotheneum patterns are **not** audio-reactive in code by default; audio is normally wired at the project level as modulation (see the next section). Add code-level audio only when a pattern genuinely needs sample-accurate reaction.
@@ -342,6 +353,14 @@ Conventions:
 - Copyright header optional (the `mcslee` patterns carry the LX license header).
 - camelCase parameter fields; the `addParameter` key equals the field name.
 - ≤ 3 controls per UI column.
+- **Fork, don't mutate**: when reworking or optimizing an existing pattern others may have in
+  saved shows, create a new class (`FooOptimized`, `FooReborn`) and state in its Javadoc exactly
+  what changed vs the original — never alter the original's behavior in place.
+- **`addParameter` keys are serialization identity**: project files reference them, so keep keys
+  stable across refactors even if the display label changes (register the old key with a new
+  label rather than renaming the key).
+- Wrap accumulated phases at their exact period (`phase %= TWO_PI`) so shows running for hours
+  neither drift in float precision nor jump on wrap.
 
 Checklist for a new pattern:
 1. Create the file in `src/main/java/apotheneum/piemonte/`.
