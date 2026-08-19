@@ -312,11 +312,17 @@ Key lifecycle gotchas that cause real bugs:
 
 Apotheneum patterns are **not** audio-reactive in code by default; audio is normally wired at the project level as modulation (see the next section). Add code-level audio only when a pattern genuinely needs sample-accurate reaction.
 
-Chromatik exposes audio as modulation sources: a **Graphic Meter** with **16 frequency bands**, a **Decibel Meter** (overall level), and a **Beat Detect** modulator (Trigger / Average / a decaying Beat ramp, with Min/Max freq). Map any of these to parameters via ⌘M.
+### Do NOT consume `lx.engine.audio.meter` for continuous modulation
 
-In code:
-- Spectrum/level: `lx.engine.audio.meter` is a `GraphicMeter` (16 bands) — read per-band energy (e.g. `getBandf(i)`), overall level, and normalized values.
-- Tempo/beats: `lx.engine.tempo` exposes BPM, beat basis, and beat events.
+This came out of upstream review of the piemonte pattern set (#44–#50): the internal meter (`lx.engine.audio.meter`, a 16-band `GraphicMeter`) has **no AGC** — it's a fixed dB gain/range mapping of whatever hits LX's audio input. Any pattern that feeds the raw smoothed level into a continuous visual quantity (brightness, spin speed, rise rate, particle count) or compares it to an **absolute** threshold (`levelEnv < 0.04`) will visibly shift with the system/mixer volume, because nothing renormalizes it per-show.
+
+**The convention instead: envelope-follow in the DAW, pipe the result in over OSC.**
+
+- The envelope-follower step runs in Ableton, bound to the M4L show-control device (`live/Apotheneum Show Control.amxd` in the upstream repo), which pushes a volume-stable 0–1 signal into Apotheneum over OSC as a modulation source. The DAW follower is tuned to the actual mix, so patterns get the same signal regardless of playback volume.
+- Pattern-side, expose **plain input parameters** for the external signal and derive everything from them. `piemonte/ParameterPattern` (upstream) is the in-repo example: a `Level` CompoundParameter (0–1, "map an external envelope follower") and a momentary `Pulse` BooleanParameter (beat trigger), with a `stepAudio(deltaMs)` step that derives attack/release envelopes, rolling averages, and beat/onset state from those inputs — never from the meter.
+- **Relative / self-normalizing uses are lower-risk**: beat detection that compares a band against its own rolling average (`bass > bassAvg * threshold`) tolerates volume changes and doesn't strictly need this treatment. The fragile case is raw level → continuous intensity, or absolute thresholds.
+
+Tempo/beats in code: `lx.engine.tempo` exposes BPM, beat basis, and beat events (tempo-locked, not level-based — fine to use directly).
 
 Verify exact method signatures against the `lx` jar (it's a provided dependency, not in this repo) — see [`references/build-and-run.md`](references/build-and-run.md).
 
@@ -330,7 +336,7 @@ What this means for how you author patterns:
 
 - **Expose clean, well-named, sensibly-ranged `LXParameter`s** (good defaults, min/max, units, `.setDescription`). A parameter's *mappability* matters more than naming it to match a global convention.
 - **Don't** invent a fixed cross-pattern control vocabulary in Java, and **don't** add a shared base class to enforce one — modulation mapping handles cross-pattern control externally.
-- Audio reactivity is wired the same way by default: an audio modulator → macro/parameter via modulation mapping; reach for code-level audio only when needed.
+- Audio reactivity is wired the same way by default: an external DAW envelope follower → OSC → pattern input parameters via modulation mapping (see the Audio section — not the internal meter); reach for code-level audio only when needed.
 
 Worked example: add a **Macro Knobs** modulator in the project → map one macro knob to several patterns' Speed/Size/Brightness-type params via modulation mapping → bind a MIDI controller to the macro knobs.
 

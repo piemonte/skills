@@ -49,6 +49,7 @@ Audio is exposed as **modulation sources** you map to parameters (default approa
 - **Decibel Meter** (top bar): overall amplitude as a modulation source.
 - **Beat Detect** modulator: outputs **Trigger** (fires on beat), **Average** (band-range level), and **Beat** (downward linear ramp with a Decay time). Min Freq / Max Freq target a band.
 - Code-level: `lx.engine.audio.meter` (a `GraphicMeter`) and `lx.engine.tempo`. Verify exact signatures against the `lx` jar (see [`build-and-run.md`](build-and-run.md)).
+- **Project convention caveat**: the internal meter has no AGC, so raw levels shift with system volume. For Apotheneum patterns, do envelope-following in the DAW and pipe the follower in over OSC to plain input parameters (`Level`/`Pulse` on `piemonte/ParameterPattern`) instead of consuming the meter for continuous modulation — see the Audio section of SKILL.md.
 
 ## Color palette & swatches ([guide](https://chromatik.co/guide/color-palette/))
 
